@@ -73,11 +73,11 @@ export const HomePage = () => {
     const signer = provider.getSigner();
 
     // Create the contract instance
-    await signer.sendTransaction({
-      to: "0x6F8B446E3CB1616FdDaaF20b0e91b3bAD66AbD41",
-      value: utils.parseEther("0.01"),
-    });
-  };
+    const contract = new Contract(
+      "0x6F8B446E3CB1616FdDaaF20b0e91b3bAD66AbD41",
+      abi,
+      signer
+    );
 
     // Call the purchase method
     setPurchaseState({ state: "PENDING_SIGNER" });
