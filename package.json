@@ -41,6 +41,7 @@
   "devDependencies": {
     "@craco/craco": "^6.1.2",
     "autoprefixer": "^9.8.6",
+    "hardhat": "^2.4.1",
     "postcss": "^7.0.36",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.4"
   }

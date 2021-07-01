@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Contract, getDefaultProvider, providers, utils } from "ethers";
 import { config } from "../config";
@@ -6,7 +7,7 @@ import axios from "axios";
 
 const provider = getDefaultProvider("rinkeby", { alchemy: config.alchemyKey });
 const contract = new Contract(
-  "0xc154187060597590a386F0d4B5680FA795731E7C",
+  "0x6F8B446E3CB1616FdDaaF20b0e91b3bAD66AbD41",
   abi,
   provider
 );
@@ -74,21 +75,17 @@ export const HomePage = () => {
 
     // Create the contract instance
     const contract = new Contract(
-      "0xc154187060597590a386F0d4B5680FA795731E7C",
+      "0x6F8B446E3CB1616FdDaaF20b0e91b3bAD66AbD41",
       abi,
       signer
     );
 
     // Call the purchase method
     setPurchaseState({ state: "PENDING_SIGNER" });
-    const receipt = await contract.purchase({ 
-      value: utils.parseEther("1"),       
-    });
-    console.log(receipt);
+    const receipt = await contract.purchase({ value: utils.parseEther("1") });
     setPurchaseState({ state: "PENDING_CONFIRMAION" });
     const transaction = await receipt.wait();
     setPurchaseState({ state: "SUCCESS", transaction });
-    console.log(transaction);
 
     // Reload the Robots
     await loadRobotsData();
@@ -97,7 +94,7 @@ export const HomePage = () => {
   return (
     <div className="min-h-screen bg-gray-800">
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">
-        <div className="text-gray-100 text-6xl pt-28 pb-10">ROBOTS</div>
+        <div className="text-gray-100 text-6xl pt-28 pb-10">Mamak Shop</div>
         {mintedNftState.state === "PENDING" && (
           <div className="text-xl text-white">LOADING...</div>
         )}
@@ -125,7 +122,7 @@ export const HomePage = () => {
             type="button"
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
-            Buy My Robot
+            Buy NFT
           </button>
         </div>
       </div>
@@ -197,4 +194,3 @@ export const HomePage = () => {
     </div>
   );
 };
-
