@@ -7,7 +7,7 @@ import axios from "axios";
 const provider = getDefaultProvider("rinkeby", { alchemy: config.alchemyKey });
 
 const contract = new Contract(
-  "0xc154187060597590a386F0d4B5680FA795731E7C",
+  "0xF89615202ee98979749aE2387d1717bf3F56A408",
   abi,
   provider
 );
@@ -83,7 +83,7 @@ export const HomePage = () => {
 
     // Create the contract instance
     const contract = new Contract(
-      "0xc154187060597590a386F0d4B5680FA795731E7C",
+      "0xF89615202ee98979749aE2387d1717bf3F56A408",
       abi,
       signer
     );
@@ -126,7 +126,7 @@ export const HomePage = () => {
     const provider = new providers.Web3Provider(window.ethereum);
 
     const signer = provider.getSigner();
-    const contract = new Contract("0xc154187060597590a386F0d4B5680FA795731E7C", abi, signer);
+    const contract = new Contract("0xF89615202ee98979749aE2387d1717bf3F56A408", abi, signer);
 
     // Call the purchase method
     setPurchaseState({ state: "PENDING_SIGNER" });
