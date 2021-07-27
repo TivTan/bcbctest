@@ -141,7 +141,7 @@ export const HomePage = () => {
       const transaction = await receipt.wait();
       setPurchaseState({ state: "SUCCESS", transaction });
     } catch (err) {
-      if (err.code == 4001) {
+      if (err.code === 4001) {
         console.log(err.code);
         alert("Transaction rejected by user, refreshing page");
         return setPurchaseState({ state: "UNINITIALIZED" });
