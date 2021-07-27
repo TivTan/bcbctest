@@ -25,14 +25,15 @@ export const HomePage = () => {
   const [purchaseState, setPurchaseState] = useState({
     state: "UNINITIALIZED",
   });
-  const modalVisible =
-    purchaseState.state === "PENDING_METAMASK" ||
-    purchaseState.state === "PENDING_SIGNER" ||
-    purchaseState.state === "PENDING_CONFIRMAION";
 
   const refreshPage = () => {
     window.location.reload();
   }
+
+  const modalVisible =
+    purchaseState.state === "PENDING_METAMASK" ||
+    purchaseState.state === "PENDING_SIGNER" ||
+    purchaseState.state === "PENDING_CONFIRMAION";
 
   const loadRobotsData = async () => {
     setMintedNftState({
@@ -101,12 +102,13 @@ export const HomePage = () => {
     } catch (err) {
       alert("Transaction rejected, refreshing page");
       setPurchaseState({ state: "UNINITIALIZED" });
+    }
 
 
-      // Reload the Robots
-      await loadRobotsData();
-    };
-  }
+    // Reload the Robots
+    await loadRobotsData();
+  };
+
 
   const [recAddress, setRecAddress] = useState("nullAdd");
   const [senderAddress, setSenderAddress] = useState("nullSender");
@@ -161,7 +163,7 @@ export const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-blue-600">
-      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">  
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">
         <div className="border-2 border-red-600 text-red-500 text-6xl pt-8 pb-8"> TivTan Marketplace </div>
         <div className="mt-12 mb-6">
           <button
