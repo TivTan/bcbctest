@@ -5,6 +5,7 @@ import abi from "../fixtures/abi.json";
 import axios from "axios";
 
 const provider = getDefaultProvider("rinkeby", { alchemy: config.alchemyKey });
+
 const contract = new Contract(
   "0xc154187060597590a386F0d4B5680FA795731E7C",
   abi,
@@ -14,6 +15,8 @@ const contract = new Contract(
 const formatIpfsUrl = (url) => {
   return url.replace(/ipfs:\/\//g, "https://cloudflare-ipfs.com/");
 };
+
+
 
 export const HomePage = () => {
   const [mintedNftState, setMintedNftState] = useState({
@@ -26,6 +29,10 @@ export const HomePage = () => {
     purchaseState.state === "PENDING_METAMASK" ||
     purchaseState.state === "PENDING_SIGNER" ||
     purchaseState.state === "PENDING_CONFIRMAION";
+
+  const refreshPage = () => {
+    window.location.reload();
+  }
 
   const loadRobotsData = async () => {
     setMintedNftState({
@@ -58,13 +65,15 @@ export const HomePage = () => {
     loadRobotsData();
   }, []);
 
+
+
   const handlePurchase = async () => {
     const { ethereum } = window;
     if (typeof ethereum == "undefined") alert("Metamask is not detected");
 
     // Prompts Metamask to connect
     setPurchaseState({ state: "PENDING_METAMASK" });
-    await ethereum.enable();
+    await ethereum.request({ method: "eth_requestAccounts" });
 
     // Create new provider from Metamask
     const provider = new providers.Web3Provider(window.ethereum);
@@ -81,54 +90,134 @@ export const HomePage = () => {
 
     // Call the purchase method
     setPurchaseState({ state: "PENDING_SIGNER" });
-    const receipt = await contract.purchase({ 
-      value: utils.parseEther("1"),       
-    });
-    console.log(receipt);
-    setPurchaseState({ state: "PENDING_CONFIRMAION" });
-    const transaction = await receipt.wait();
-    setPurchaseState({ state: "SUCCESS", transaction });
-    console.log(transaction);
+    try {
+      const receipt = await contract.purchase({
+        value: utils.parseEther("1"),
+      });
+      console.log(receipt);
+      setPurchaseState({ state: "PENDING_CONFIRMAION" });
+      const transaction = await receipt.wait();
+      setPurchaseState({ state: "SUCCESS", transaction });
+    } catch (err) {
+      alert("Transaction rejected, refreshing page");
+      setPurchaseState({ state: "UNINITIALIZED" });
 
-    // Reload the Robots
+
+      // Reload the Robots
+      await loadRobotsData();
+    };
+  }
+
+  const [recAddress, setRecAddress] = useState("nullAdd");
+  const [senderAddress, setSenderAddress] = useState("nullSender");
+  const [tokenId, setTokenId] = useState("nullID");
+
+  const handleTransfer = async () => {
+    const { ethereum } = window;
+    if (typeof ethereum == "undefined") {
+      alert("Metamask is not detected");
+    } else if (recAddress === "nullAdd") {
+      return alert("No address detected in input box");
+    }
+
+    setPurchaseState({ state: "PENDING_METAMASK" });
+    await ethereum.request({ method: "eth_requestAccounts" });
+
+    const provider = new providers.Web3Provider(window.ethereum);
+
+    const signer = provider.getSigner();
+    const contract = new Contract("0xc154187060597590a386F0d4B5680FA795731E7C", abi, signer);
+
+    // Call the purchase method
+    setPurchaseState({ state: "PENDING_SIGNER" });
+    try {
+      const receipt = await contract.transferFrom(
+        senderAddress,
+        recAddress,
+        tokenId
+      );
+
+      setPurchaseState({ state: "PENDING_CONFIRMAION" });
+      const transaction = await receipt.wait();
+      setPurchaseState({ state: "SUCCESS", transaction });
+    } catch (err) {
+      if (err.code == 4001) {
+        console.log(err.code);
+        alert("Transaction rejected by user, refreshing page");
+        return setPurchaseState({ state: "UNINITIALIZED" });
+      } else {
+        console.log(err.code);
+        alert(
+          "error!"
+        );
+        return setPurchaseState({ state: "UNINITIALIZED" });
+      }
+    }
+
     await loadRobotsData();
+    setRecAddress("nullAdd");
   };
 
+
   return (
-    <div className="min-h-screen bg-gray-800">
+    <div className="min-h-screen bg-blue-500">
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">
-        <div className="text-gray-100 text-6xl pt-28 pb-10">ROBOTS</div>
+        <div className="text-gray-100 text-6xl pt-20 pb-8">ROBOTS</div>
+        <div className="mt-12 mb-6">
+          <button
+            onClick={handlePurchase}
+            type="button"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            Buy NFT
+          </button>
+        </div>
         {mintedNftState.state === "PENDING" && (
           <div className="text-xl text-white">LOADING...</div>
         )}
         {mintedNftState.state === "SUCCESS" && (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-5">
             {mintedNftState.data.map(
               ({ id, image, name, description, owner }) => {
                 return (
-                  <div key={id} className="bg-white rounded p-2">
-                    <img src={image} className="mx-auto p-4" alt={name} />
+                  <div key={id} className="bg-white rounded p-2 mb-6">
+                    <img
+                      src={image} className="border-2 border-black mx-auto p-4" alt={name} />
                     <div className="text-xl">{name}</div>
                     <div className="">{description}</div>
                     <hr className="my-4" />
                     <div className="text-left text-sm">Owned By:</div>
-                    <div className="text-left text-xs">{owner}</div>
+                    <div className="text-left text-xs pb-2">{owner}</div>
+
+                    <div className="text-left text-s m-1 space-x-1 pb-1">
+                      <label>Transfer: </label>
+                      <input
+                        className="border-2 border-black py-0"
+                        type="text"
+                        onChange={(event) => {
+                          setRecAddress(event.target.value);
+                          setSenderAddress(owner);
+                          setTokenId(id);
+                        }}
+                      />
+
+                      <button
+                        className="m-3 items-center px-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        onClick={handleTransfer}
+                      >
+                        Gift NFT
+                      </button>
+
+                    </div>
                   </div>
                 );
               }
             )}
           </div>
         )}
-        <div className="mt-12">
-          <button
-            onClick={handlePurchase}
-            type="button"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-          >
-            Buy My Robot
-          </button>
-        </div>
+
       </div>
+
       {modalVisible && (
         <div
           className="fixed z-10 inset-0 overflow-y-auto"
@@ -145,7 +234,7 @@ export const HomePage = () => {
               className="hidden sm:inline-block sm:align-middle sm:h-screen"
               aria-hidden="true"
             >
-              
+
             </span>
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
               <div>
@@ -178,6 +267,7 @@ export const HomePage = () => {
                     {purchaseState.state === "PENDING_CONFIRMAION" &&
                       "Waiting for Block Confirmation"}
                   </h3>
+
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
                       {purchaseState.state === "PENDING_METAMASK" &&
@@ -187,14 +277,22 @@ export const HomePage = () => {
                       {purchaseState.state === "PENDING_CONFIRMAION" &&
                         "Transaction has been sent to the blockchain. Please wait while the transaction is being confirmed."}
                     </p>
+                    <div className="m-3">
+                      <button
+                        onClick={refreshPage}
+                        type="button"
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-300 hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Reload
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
-};
-
+      )
+      }
+    </div >
+  )
+}
