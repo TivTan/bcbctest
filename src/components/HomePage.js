@@ -160,9 +160,9 @@ export const HomePage = () => {
 
 
   return (
-    <div className="min-h-screen bg-blue-500">
-      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">
-        <div className="text-gray-100 text-6xl pt-20 pb-8"> Tivtan RoboNFT Marketplace </div>
+    <div className="min-h-screen bg-blue-600">
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">  
+        <div className="border-2 border-red-600 text-red-500 text-6xl pt-8 pb-8"> TivTan Marketplace </div>
         <div className="mt-12 mb-6">
           <button
             onClick={handlePurchase}
