@@ -162,14 +162,14 @@ export const HomePage = () => {
   return (
     <div className="min-h-screen bg-blue-500">
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 ">
-        <div className="text-gray-100 text-6xl pt-20 pb-8">ROBOTS</div>
+        <div className="text-gray-100 text-6xl pt-20 pb-8"> Tivtan RoboNFT Marketplace </div>
         <div className="mt-12 mb-6">
           <button
             onClick={handlePurchase}
             type="button"
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
-            Buy NFT
+            Get a Robo NFT!
           </button>
         </div>
         {mintedNftState.state === "PENDING" && (
@@ -205,7 +205,7 @@ export const HomePage = () => {
                         className="m-3 items-center px-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                         onClick={handleTransfer}
                       >
-                        Gift NFT
+                        NFT Giftaway
                       </button>
 
                     </div>
